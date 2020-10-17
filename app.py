@@ -1,44 +1,56 @@
-import csv
-import requests
+"""imports"""
+from os import path, remove
 import random
 import webbrowser
-from os import path
-from os import remove
-file_url = "https://www.imdb.com/list/ls045750802/export"
-file_path = "watchlist.csv"
-item_list =[]
+import csv
+import requests
 
-class item:
-    def __init__(self, id, title, rating, url):
-       self.id = id
-       self.title = title
-       self.rating = rating
-       self.url = url 
+FILE_URL = "https://www.imdb.com/list/ls045750802/export"
+FILE_PATH = "watchlist.csv"
+ITEM_LIST = []
+
+
+class Item:
+    """A movie or a TV show information."""
+    def __init__(self, imdb_id, title, rating, url):
+        self.imdb_id = imdb_id
+        self.title = title
+        self.rating = rating
+        self.url = url
+
 
 def main():
-    getWatchlist()
-    fillList()
-    pickRandom()
+    """The main function."""
+    get_watchlist()
+    fill_list()
+    pick_random()
 
-def getWatchlist():
-    if(path.exists(file_path)):
-        remove(file_path)
-    response = requests.get(file_url)
-    open('watchlist.csv','wb').write(response.content)
+
+def get_watchlist():
+    """Get the watchlist from IMDb."""
+    if path.exists(FILE_PATH):
+        remove(FILE_PATH)
+    response = requests.get(FILE_URL)
+    open('watchlist.csv', 'wb').write(response.content)
     print("Watchlist updated.")
 
-def fillList():
-    with open('watchlist.csv', 'rt') as d:
-        data = csv.reader(d)
-        for row in data:
-            item_list.append(item(row[0],row[5],row[8],row[6]))
 
-def pickRandom():
-    random_id = random.randrange(len(item_list)+1)
-    for items in item_list:
-        if(items.id == str(random_id)):
+def fill_list():
+    """Fill a list with films and Tv shows from my IMDb watchlist."""
+    with open('watchlist.csv', 'rt') as data:
+        data = csv.reader(data)
+        for row in data:
+            ITEM_LIST.append(Item(row[0], row[5], row[8], row[6]))
+
+
+def pick_random():
+    """Pick a random item (movie or TV show) from the list."""
+    random_id = random.randrange(len(ITEM_LIST)+1)
+    for items in ITEM_LIST:
+        if items.id == str(random_id):
             print(f"Picked item: {items.title}")
             webbrowser.open(items.url)
+
 
 if __name__ == "__main__":
     main()
